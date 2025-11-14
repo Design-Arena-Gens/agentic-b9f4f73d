@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  goldBalance Int     @default(0)
+  usdBalance  Float   @default(0)
+  energy      Int     @default(100)
+  maxEnergy   Int     @default(100)
+  lastEnergyUpdate DateTime @default(now())
+  isAdmin     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nfts        NFT[]
+  transactions Transaction[]
+  adViews     AdView[]
+  battles     Battle[]
+  farmRewards FarmReward[]
+  marketListings MarketListing[]
+  purchases   Purchase[]
+
+  @@index([email])
+  @@index([username])
+}
+
+model Config {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model NFT {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String
+  rarity      String   // COMMON, UNCOMMON, RARE, EPIC, LEGENDARY
+  farmPower   Int      // GOLD per hour
+  battlePower Int
+  price       Int      // in GOLD
+  priceUsd    Float
+  ownerId     String?
+  owner       User?    @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+
+  marketListing MarketListing?
+
+  @@index([ownerId])
+  @@index([rarity])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // PURCHASE, WITHDRAW, DEPOSIT, AD_REWARD, FARM_REWARD, BATTLE_WIN, BATTLE_LOSS
+  goldAmount  Int
+  usdAmount   Float
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model AdView {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  provider    String   // UNITY_ADS, ADMOB, APPLOVIN, IRONSOURCE
+  adToken     String   // Anti-bot validation
+  goldReward  Int
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Battle {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  entryFee    Int      // in GOLD
+  reward      Int      // in GOLD
+  result      String   // WIN, LOSS, DRAW
+  opponentName String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model FarmReward {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  goldAmount  Int
+  nftCount    Int
+  farmPower   Int
+  claimedAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([claimedAt])
+}
+
+model MarketListing {
+  id          String   @id @default(cuid())
+  nftId       String   @unique
+  nft         NFT      @relation(fields: [nftId], references: [id])
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  priceGold   Int
+  priceUsd    Float
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([sellerId])
+  @@index([active])
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  itemType    String   // NFT, ENERGY, BOOST, COSMETIC, BOX
+  itemId      String?
+  goldAmount  Int
+  usdAmount   Float
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([itemType])
+}
+
+model Box {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  priceGold   Int
+  priceUsd    Float
+  rarityWeights String // JSON: {"COMMON": 50, "UNCOMMON": 30, "RARE": 15, "EPIC": 4, "LEGENDARY": 1}
+  active      Boolean  @default(true)
+}
+
+model Boost {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  effect      String   // FARM_MULTIPLIER, ENERGY_REGEN, BATTLE_POWER
+  multiplier  Float
+  durationHours Int
+  priceGold   Int
+  priceUsd    Float
+  active      Boolean  @default(true)
+}
+
+model Cosmetic {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String
+  category    String   // AVATAR, BACKGROUND, FRAME, BADGE
+  priceGold   Int
+  priceUsd    Float
+  active      Boolean  @default(true)
+}

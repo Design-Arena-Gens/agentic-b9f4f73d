@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white min-h-screen;
+}
+
+.card {
+  @apply bg-gray-800 bg-opacity-80 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-gray-700;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700;
+}
+
+.btn-secondary {
+  @apply btn bg-gray-700 hover:bg-gray-600;
+}
+
+.btn-gold {
+  @apply btn bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900;
+}
+
+.btn-danger {
+  @apply btn bg-red-600 hover:bg-red-700;
+}
+
+.input {
+  @apply w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500;
+}
+
+.rarity-common {
+  @apply border-gray-500 bg-gray-700;
+}
+
+.rarity-uncommon {
+  @apply border-green-500 bg-green-900;
+}
+
+.rarity-rare {
+  @apply border-blue-500 bg-blue-900;
+}
+
+.rarity-epic {
+  @apply border-purple-500 bg-purple-900;
+}
+
+.rarity-legendary {
+  @apply border-yellow-500 bg-yellow-900;
+}
